@@ -57,7 +57,7 @@ class PydanticDTO(AbstractDTO[T], Generic[T]):
 
         if pydantic.VERSION.startswith("1"):  # pragma: no cover
             model_fields: dict[str, pydantic.fields.FieldInfo] = {
-                k: model_field.field_info
+                k: model_field.field_info  # pyright: ignore
                 for k, model_field in model_type.__fields__.items()  # type: ignore[attr-defined]
             }
         else:

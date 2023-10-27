@@ -433,8 +433,8 @@ def test_create_schema_for_field() -> None:
             value: str = Field(
                 title="title",
                 description="description",
-                example="example",
-                max_length=16,  # pyright: ignore
+                example="example",  # pyright: ignore
+                max_length=16,
             )
         else:
             value: str = Field(  # type: ignore[no-redef]
