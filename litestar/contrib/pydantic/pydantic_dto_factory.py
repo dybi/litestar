@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
     from litestar.typing import FieldDefinition
 
-
 try:
     import pydantic
     from pydantic import ValidationError
@@ -58,8 +57,9 @@ class PydanticDTO(AbstractDTO[T], Generic[T]):
 
         if pydantic.VERSION.startswith("1"):  # pragma: no cover
             model_fields: dict[str, pydantic.fields.FieldInfo] = {
-                k: model_field.field_info for k, model_field in model_type.__fields__.items()
-            }  # type: ignore
+                k: model_field.field_info
+                for k, model_field in model_type.__fields__.items()  # type: ignore[attr-defined]
+            }
         else:
             model_fields = dict(model_type.model_fields)
 
