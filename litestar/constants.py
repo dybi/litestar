@@ -17,6 +17,7 @@ OPENAPI_NOT_INITIALIZED: Final = "Litestar has not been instantiated with OpenAP
 REDIRECT_STATUS_CODES: Final = {301, 302, 303, 307, 308}
 REDIRECT_ALLOWED_MEDIA_TYPES: Final = {MediaType.TEXT, MediaType.HTML, MediaType.JSON}
 RESERVED_KWARGS: Final = {"state", "headers", "cookies", "request", "socket", "data", "query", "scope", "body"}
+SCOPE_STATE_CSRF_TOKEN_KEY = "csrf_token"  # noqa: S105  # possible hardcoded password
 SCOPE_STATE_DEPENDENCY_CACHE: Final = "dependency_cache"
 SCOPE_STATE_NAMESPACE: Final = "__litestar__"
 SCOPE_STATE_RESPONSE_COMPRESSED: Final = "response_compressed"
@@ -26,15 +27,20 @@ UNDEFINED_SENTINELS: Final = {Signature.empty, Empty, Ellipsis, MISSING, UnsetTy
 WEBSOCKET_CLOSE: Final = "websocket.close"
 WEBSOCKET_DISCONNECT: Final = "websocket.disconnect"
 
+
 try:
-    import pydantic
+    from pydantic.fields import PydanticUndefined as Pydantic2Undefined  # type: ignore[attr-defined]
+    from pydantic.v1.fields import Undefined as Pydantic1Undefined
 
-    if pydantic.VERSION.startswith("2"):
-        from pydantic_core import PydanticUndefined
-    else:  # pragma: no cover
-        from pydantic.fields import Undefined as PydanticUndefined  # type: ignore
-
-    UNDEFINED_SENTINELS.add(PydanticUndefined)
-
+    PYDANTIC_UNDEFINED_SENTINELS = {Pydantic1Undefined, Pydantic2Undefined}
 except ImportError:
-    pass
+    try:
+        from pydantic.v1.fields import Undefined as Pydantic1Undefined
+
+        PYDANTIC_UNDEFINED_SENTINELS = {Pydantic1Undefined}
+
+    except ImportError:  # pyright: ignore
+        PYDANTIC_UNDEFINED_SENTINELS = set()
+
+
+UNDEFINED_SENTINELS.update(PYDANTIC_UNDEFINED_SENTINELS)
